@@ -1,0 +1,14 @@
+FROM semaphoreui/semaphore:latest
+
+COPY python-dependencies.txt /home/semaphore
+USER root
+# allow semaphore user to elevate priviledges without a password
+RUN mkdir -p /etc/sudoers.d
+RUN echo 'semaphore ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/semaphore
+RUN chmod -R -v 0440 /etc/sudoers.d
+
+RUN apk add --no-cache py3-pip cifs-utils sudo
+RUN pip install -r python-dependencies.txt
+
+USER 1001
+RUN export PATH=$PATH:/home/semaphore/.local/bin

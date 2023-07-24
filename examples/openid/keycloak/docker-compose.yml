@@ -1,0 +1,61 @@
+version: '3'
+
+volumes:
+  mysql_data:
+      driver: local
+
+services:
+  semaphore:
+    image: semaphoreui/semaphore:prod-compose-with-keycloak
+    build:
+      context: ./../../../
+      dockerfile: ./deployment/docker/prod/Dockerfile
+    environment:
+      SEMAPHORE_DB_DIALECT: mysql
+      SEMAPHORE_DB_USER: root
+      SEMAPHORE_DB_PASS: root
+      SEMAPHORE_DB_HOST: mariadb
+      SEMAPHORE_DB_PORT: 3306
+      SEMAPHORE_DB: semaphore    
+      SEMAPHORE_ADMIN_PASSWORD: admin
+      SEMAPHORE_ADMIN_NAME: admin
+      SEMAPHORE_ADMIN_EMAIL: admin@localhost
+      SEMAPHORE_ADMIN: admin
+      PORT: 3000
+    ports: 
+      - "3000:3000"
+    depends_on:
+      - mariadb
+    volumes:
+      - type: bind
+        source: ./config.json
+        target: /etc/semaphore/config.json
+  mariadb:
+      image: mariadb
+      volumes:
+        - mysql_data:/var/lib/mysql
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: keycloak
+        MYSQL_USER: keycloak
+        MYSQL_PASSWORD: password
+      # Copy-pasted from https://github.com/docker-library/mariadb/issues/94
+      healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "--silent"]
+  keycloak:
+      image: quay.io/keycloak/keycloak:legacy
+      environment:
+        DB_VENDOR: mariadb
+        DB_ADDR: mariadb
+        DB_DATABASE: keycloak
+        DB_USER: keycloak
+        DB_PASSWORD: password
+        KEYCLOAK_USER: admin
+        KEYCLOAK_PASSWORD: Pa55w0rd
+        JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
+      ports:
+        - "8080:8080"
+        - "8443:8443"
+        - "9990:9990"
+      depends_on:
+        - mariadb
