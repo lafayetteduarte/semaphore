@@ -10,7 +10,7 @@ This folder contains examples on hot to run semaphore with specific requirements
 [OpenID Examples](/examples/openid/READM.md)
 
 # LDAP Examples
-[LDAP Examples](/examples/ldap/READM.md)
+[LDAP Examples](/examples/ldap/README.md)
 
 ## Custom Docker Image + python libraries
 [Custom semaphore Docker Image](/examples/Custom-Python-Libs-On-Docker/READM.md)
