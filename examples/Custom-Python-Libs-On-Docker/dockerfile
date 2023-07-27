@@ -6,8 +6,10 @@ USER root
 RUN mkdir -p /etc/sudoers.d
 RUN echo 'semaphore ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/semaphore
 RUN chmod -R -v 0440 /etc/sudoers.d
-
+# Add custom apk packages ( eg: cifs-utils to mount network paths)
 RUN apk add --no-cache py3-pip cifs-utils sudo
+
+# Install necessary python dependencies to out custom image
 RUN pip install -r python-dependencies.txt
 
 USER 1001

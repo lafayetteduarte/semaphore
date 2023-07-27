@@ -1,9 +1,16 @@
 # Semaphore Examples
-this folder contains examples on hot to run semaphore with specific requirements such as:
+This folder contains examples on hot to run semaphore with specific requirements such as:
 
 - Using openID as an authentication method
 - using LDAP authentication
 - Creating a custom image to install python dependencies
 
 
-TODO: Link the resources here. ( maybe using a FAQ format?)
+## OpenID Examples
+[OpenID Examples](/examples/openid/READM.md)
+
+# LDAP Examples
+[LDAP Examples](/examples/ldap/READM.md)
+
+## Custom Docker Image + python libraries
+[Custom semaphore Docker Image](/examples/Custom-Python-Libs-On-Docker/READM.md)
