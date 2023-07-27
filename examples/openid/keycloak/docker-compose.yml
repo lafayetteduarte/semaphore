@@ -6,6 +6,7 @@ volumes:
 
 services:
   semaphore:
+    #network_mode: "host"
     image: semaphoreui/semaphore:prod-compose-with-keycloak
     build:
       context: ./../../../
@@ -31,31 +32,43 @@ services:
         source: ./config.json
         target: /etc/semaphore/config.json
   mariadb:
-      image: mariadb
-      volumes:
-        - mysql_data:/var/lib/mysql
-      environment:
-        MYSQL_ROOT_PASSWORD: root
-        MYSQL_DATABASE: keycloak
-        MYSQL_USER: keycloak
-        MYSQL_PASSWORD: password
+    image: mariadb
+    #network_mode: "host"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
       # Copy-pasted from https://github.com/docker-library/mariadb/issues/94
-      healthcheck:
-        test: ["CMD", "mysqladmin", "ping", "--silent"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent"]
   keycloak:
-      image: quay.io/keycloak/keycloak:legacy
-      environment:
-        DB_VENDOR: mariadb
-        DB_ADDR: mariadb
-        DB_DATABASE: keycloak
-        DB_USER: keycloak
-        DB_PASSWORD: password
-        KEYCLOAK_USER: admin
-        KEYCLOAK_PASSWORD: Pa55w0rd
-        JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
-      ports:
-        - "8080:8080"
-        - "8443:8443"
-        - "9990:9990"
-      depends_on:
-        - mariadb
+    volumes:
+      - ./imports/realm-export.json:/opt/keycloak/data/import/realm.json
+    image: quay.io/keycloak/keycloak:latest
+    hostname: keycloak
+    command: 
+      - -v 
+      - start-dev
+      - --import-realm
+    environment:
+      DB_VENDOR: mariadb
+      DB_ADDR: mariadb
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: Pa55w0rd
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: Pa55w0rd
+      KEYCLOAK_CREATE_ADMIN_USER: true
+      JGROUPS_DISCOVERY_PROTOCOL: JDBC_PING
+      #KEYCLOAK_FRONTEND_URL: http://keycloak:8080/auth
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "9990:9990"
+    depends_on:
+      - mariadb
