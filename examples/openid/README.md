@@ -1,4 +1,4 @@
-# Examples on how ti use openid authentication
+# Examples on how to use openid authentication
 
 ## A primer on Openid
 https://auth0.com/blog/learn-identity-concepts-video-lectures-auth0-onboarding/
@@ -14,4 +14,4 @@ Soon
 
 ## How to use semaphore with LDAP
 
-Soon
+[Semaphore openLDAP Authentication](/examples/ldap/README.md)

@@ -1,0 +1,62 @@
+version: '3.7'
+services:
+  semaphore:
+    #network_mode: "host"
+    image: semaphoreui/semaphore:prod-compose-with-openldap
+    build:
+      context: ./../../
+      dockerfile: ./deployment/docker/prod/Dockerfile
+    environment:
+      SEMAPHORE_BOLT_HOST: "semaphore.bolt"
+      SEMAPHORE_DB_DIALECT: bolt
+      SEMAPHORE_DB: semaphore
+      SEMAPHORE_PLAYBOOK_PATH: "/tmp/semaphore/"
+      SEMAPHORE_ADMIN_PASSWORD: P@ssw0rd
+      SEMAPHORE_ADMIN_NAME: admin
+      SEMAPHORE_ADMIN_EMAIL: admin@localhost
+      SEMAPHORE_ADMIN: admin
+      ANSIBLE_HOST_KEY_CHECKING: "false"
+      SEMAPHORE_ACCESS_KEY_ENCRYPTION: "gs72mPntFAT23s9qK0pQ0rKtfidlexiMjYCH9gWKhTU="
+      SEMAPHORE_LDAP_ACTIVATED: 'yes' # if you wish to use ldap, set to: 'yes' 
+      SEMAPHORE_LDAP_HOST: "ldap_server"
+      SEMAPHORE_LDAP_PORT: "389"
+      SEMAPHORE_LDAP_NEEDTLS: "no"
+      SEMAPHORE_LDAP_DN_BIND: 'cn=admin,dc=semaphore,dc=org'
+      SEMAPHORE_LDAP_PASSWORD: "test1234"
+      SEMAPHORE_LDAP_DN_SEARCH: "dc=semaphore,dc=org"
+      SEMAPHORE_LDAP_SEARCH_FILTER: '(&(mail=%s)(memberOf=cn=Admins,ou=Groups,dc=semaphore,dc=org))'
+      SEMAPHORE_LDAP_MAPPING_DN: "dn"
+      SEMAPHORE_LDAP_MAPPING_FULLNAME: "displayName"
+      SEMAPHORE_LDAP_MAPPING_USERNAME: "mail"
+      SEMAPHORE_LDAP_MAPPING_EMAIL: "mail"
+    ports: 
+      - "3000:3000"
+    depends_on:
+      - ldap_server
+  ldap_server:
+    image: osixia/openldap
+    build:
+      context: .
+    environment:
+      LDAP_ADMIN_PASSWORD: test1234
+      ENV LDAP_ORGANISATION: "Semaphore Demo ORG"
+      LDAP_DOMAIN: "semaphore.org"
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
+      LDAP_TLS_ENFORCE: "false"
+    ports:
+      - 389:389
+    volumes:
+      - ldap_data:/var/lib/ldap
+      - ldap_config:/etc/ldap/slapd.d
+  ldap_server_admin:
+    image: osixia/phpldapadmin:latest
+    ports:
+      - 8090:80
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: ldap_server
+      PHPLDAPADMIN_HTTPS: 'false'
+    depends_on:
+      - ldap_server  
+volumes:
+  ldap_data:
+  ldap_config:

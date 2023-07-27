@@ -1,0 +1,2 @@
+FROM osixia/openldap
+COPY ./openldap-seed/bootstrap-semaphore.ldif /container/service/slapd/assets/config/bootstrap/ldif/50-bootstrap.ldif
