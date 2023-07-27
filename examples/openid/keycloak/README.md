@@ -37,4 +37,8 @@ the seed file is located at the examples\openid\keycloak\imports\realm-export.js
 
 Semaphore config.json are located at examples\openid\keycloak\config.json
 
+the seed file contains one test user with the folowing creds:
+
+username /password : user1@semaphore.com / semaphore
+
 
